@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 .navbar {
     display: flex;
     align-items: center;
@@ -14,6 +16,24 @@
 
 .nav-profile {
     width: 40px;
+}
+
+.nav-right {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+}
+
+.nav_button {
+    background-color: #6b7280; 
+    color: #ffffff;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    line-height: 1rem;
 }
 
 @media(max-width:800px) {

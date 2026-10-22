@@ -8,11 +8,11 @@ import { Cart } from './Pages/Cart';
 import { LoginSignup } from './Pages/LoginSignup';
 import { Footer } from './Components/Footer/Footer';
 import PlaceOrder from './Pages/PlaceOrder';
+import Orders from './Pages/Orders';
 
 function App() {
   return (
     <div>
-      <BrowserRouter>
       <Navbar/>
       <Routes>
         <Route path='/' element={<Shop/>}/>
@@ -24,10 +24,10 @@ function App() {
         </Route>
         <Route path='/cart' element={<Cart/>}/>
         <Route path='/login' element={<LoginSignup/>}/>
-        <Route path='/place_order' element={<PlaceOrder/>}/>
+        <Route path='/placeOrder' element={<PlaceOrder/>}/>
+        <Route path='/orders' element={<Orders/>}/>
         </Routes>
-       <Footer/>  
-      </BrowserRouter>
+       <Footer/>
       
     </div>
   );

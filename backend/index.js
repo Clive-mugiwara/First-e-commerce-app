@@ -14,7 +14,7 @@
 
 const port = 4000;
 import express from "express";
-const app = express();
+export const app = express();
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import multer from "multer";
@@ -33,6 +33,9 @@ import 'dotenv/config';
 
 app.use(express.json());
 app.use(cors());
+
+import adminAuth from "./middleware/adminAuth.js";
+import fetchUser from "./middleware/fetchUser.js";
 
 // Database connection with mongodb
 mongoose.connect('mongodb://daeclive_db_user:iqc4yBOGlNjJe2AS@ac-nf7ud8g-shard-00-00.ijbbjwn.mongodb.net:27017,ac-nf7ud8g-shard-00-01.ijbbjwn.mongodb.net:27017,ac-nf7ud8g-shard-00-02.ijbbjwn.mongodb.net:27017/?ssl=true&replicaSet=atlas-s2qsxn-shard-0&authSource=admin&appName=Cluster0');
@@ -70,7 +73,7 @@ app.post("/upload",upload.single('product'),(req,res)=>{
 
 //schema for creating products
 
-const Product = mongoose.model("Product",{
+export const Product = mongoose.model("Product",{
     id:{
         type: Number,
         required: true,
@@ -115,27 +118,30 @@ app.get('/allproducts',async (req,res)=>{
 })
 
 
+// impporting user Model
+import Users from './models/userModel.js'
+
 //creating schema for user model
 
-const Users = mongoose.model('Users',{
-    name:{
-        type:String,
-    },
-    email:{
-        type:String,
-        unique:true,
-    },
-    password:{
-        type:String,
-    },
-    cartData:{
-        type:Object,
-    },
-    date:{
-        type:Date,
-        default:Date.now,
-    }
-})
+// const Users = mongoose.model('Users',{
+//     name:{
+//         type:String,
+//     },
+//     email:{
+//         type:String,
+//         unique:true,
+//     },
+//     password:{
+//         type:String,
+//     },
+//     cartData:{
+//         type:Object,
+//     },
+//     date:{
+//         type:Date,
+//         default:Date.now,
+//     }
+// })
 
 //creating endpoint for registering the user
 app.post('/signup',async(req,res)=>{
@@ -144,10 +150,12 @@ app.post('/signup',async(req,res)=>{
     if (check) {
         return res.status(400).json({success:false,errors:"Existing user found with the same email address"})
     }
-    let cart = {};
-    for (let i=0; i < 300; i++) {
-        cart[i]=0;
+    const emptyCart = {};
+    for (let i = 0; i < 300; i++) {
+        emptyCart[i] = 0;
     }
+
+    await userModel.findByIdAndUpdate(userId, { cartData: emptyCart });
 
     const user = new Users({
         name:req.body.username,
@@ -184,11 +192,11 @@ app.post('/login',async (req,res)=>{
             res.json({success:true,token});
         }
         else{
-            res.json({success:false,errors:"Wrong Password"});
+            res.json({success:false,errors:"Enter correct Email address or Password"});
         }
     }
     else{
-        res.json({success:false,errors:"Enter correct email address"})
+        res.json({success:false,errors:"Enter correct Email address or Password"})
     }
 })
 
@@ -201,24 +209,6 @@ app.get('/newcollections',async (req,res)=>{
     res.send(newcollection);
     
 })
-
-
-//creating middleware to fetch user
-const fetchUser = async (req,res,next)=>{
-    const token = req.header('auth-token');
-    if (!token) {
-        res.status(401).send({errors:'Please authenticate using valid token'})
-    }
-    else{
-        try{
-            const data = jwt.verify(token,'secret_ecom');
-            req.user = data.user;
-            next();
-        } catch (error) {
-            res.status(401).send({errors:'Please authenticate using a valid token'})
-        }
-    }
-}
 
 
 
@@ -312,30 +302,6 @@ function timingSafeEqual(a, b) {
 }
 
 
-const adminAuth = async (req,res,next) => {
-    try {
-        const {token} = req.headers
-        if (!token) {
-            return res.json({success:false,message:"Not Authorized. Login to Proceed"})
-        }
-        const token_decode = jwt.verify(token,process.env.JWT_SECRET);
-        console.log(token_decode);        
-        if (token_decode.role !== 'admin' || token_decode.email !== process.env.ADMIN_EMAIL) {
-            return res.json({ success: false, message: "Not Authorized Login Again" });
-        }
-        next()
-    } catch (error) {
-       console.log(error);
-       res.json({success:false,message: "Something went wrong"})
-        
-    }
-}
-
-// export default adminAuth
-
-
-
-
 //api for adding product
 app.post('/addproduct',adminAuth,async (req,res) =>{
     let products = await Product.find({});
@@ -378,6 +344,10 @@ app.post('/removeproduct',adminAuth,async(req,res)=>{
     })
 })
 
+import orderRouter from "./routes/orderRoutes.js";
+app.use('/api/order',orderRouter)
+
+
 
 app.listen(port,(error)=>{
     if (!error) {
@@ -388,3 +358,5 @@ app.listen(port,(error)=>{
         console.log("Error : "+error)
     }
 })
+
+

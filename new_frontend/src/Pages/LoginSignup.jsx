@@ -36,7 +36,7 @@ export const LoginSignup = () => {
       alert(responseData.errors);
     }
   } catch (error) {
-    console.error("Signup failed:", error);
+    console.error("Login failed:", error);
     alert("Something went wrong. Please try again.");
   }
           

@@ -53,15 +53,15 @@ export const CartItems = () => {
                         <h3>${getTotalCartAmount()}</h3>
                     </div>
                 </div>
-                <Link to='/place_order'><button>PROCEED TO CHECKOUT</button></Link>
+                <Link to='/placeOrder'><button>PROCEED TO CHECKOUT</button></Link>
             </div>
-            <div className="cartitems-promocode">
+            {/* <div className="cartitems-promocode">
                 <p>If you have a promo code, Enter it here</p>
                 <div className="cartitems-promobox">
                     <input type="text" placeholder='promo code' />
                     <button>Submit</button>
                 </div>
-            </div>
+            </div> */}
         </div>
     </div>
   )

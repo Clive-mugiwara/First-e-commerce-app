@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { data } from 'react-router-dom';
+// import { data } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 export const ShopContext = createContext(null);
 
@@ -11,11 +12,16 @@ const getDefaultCart = () =>{
         return cart;
     }
 
+
+
 const ShopContextProvider = (props) => {
 
 
     const [all_product,setAll_Product] = useState([]);
     const [cartItems,setCartItems] = useState(getDefaultCart());
+    const [token, setToken] = useState("");
+    const navigate = useNavigate();
+    const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
     useEffect(()=>{
         fetch('http://localhost:4000/allproducts')
@@ -100,12 +106,22 @@ const ShopContextProvider = (props) => {
         return totalItem;
     }
 
-    const contextValue = {getTotalCartAmount,getTotalCartItems,all_product,cartItems,addToCart,removeFromCart}
+
+    // Restore token from localStorage on refresh, then load the saved cart
+    useEffect(() => {
+      if (!token && localStorage.getItem("auth-token")) {
+        const savedToken = localStorage.getItem("auth-token");
+        setToken(savedToken);
+      }
+    }, []);
+
+    const contextValue = {navigate,token,getTotalCartAmount,getTotalCartItems,all_product,cartItems,setCartItems,addToCart,removeFromCart,backendUrl};
+
     return (
         <ShopContext.Provider value={contextValue}>
             {props.children}
         </ShopContext.Provider>
-    )
-}
+    );
+};
 
 export default ShopContextProvider;
